@@ -19,6 +19,15 @@ import kotlinx.coroutines.launch
 
 class SaveArtActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySaveArtBinding
+    private val location = ArtLocation()
+
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val data: Intent = result.data!!
+            location.x = data.getFloatExtra("targetX", 0f)
+            location.y = data.getFloatExtra("targetY", 0f)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +84,7 @@ class SaveArtActivity : AppCompatActivity() {
         val repository = FirebaseArtsRepository()
 
         binding.artLocationField.setOnClickListener {
-            startActivity(Intent(this, SaveArtLocationActivity::class.java))
+            startForResult.launch(Intent(this, SaveArtLocationActivity::class.java))
         }
         binding.saveArtButton.setOnClickListener {
             try {
@@ -97,8 +106,8 @@ class SaveArtActivity : AppCompatActivity() {
             }
         }
 
-        setSupportActionBar(binding.topAppBar);
-        getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(binding.topAppBar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

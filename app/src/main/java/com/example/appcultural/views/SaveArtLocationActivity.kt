@@ -1,7 +1,8 @@
 package com.example.appcultural.views
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,9 @@ class SaveArtLocationActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySaveArtLocationBinding
     private var currentCircleView: CirclePointView? = null
 
+    private var targetX = 0f
+    private var targetY = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,6 +37,8 @@ class SaveArtLocationActivity : AppCompatActivity() {
             if (event.action == MotionEvent.ACTION_UP) {
                 val x = event.x
                 val y = event.y
+                targetX = x
+                targetY = y
                 currentCircleView?.let {
                     it.visibility = View.GONE
                     (v.parent as ViewGroup).removeView(it)
@@ -43,6 +49,11 @@ class SaveArtLocationActivity : AppCompatActivity() {
         }
 
         binding.saveLocationButton.setOnClickListener {
+            val data = Intent().apply {
+                putExtra("targetX", targetX)
+                putExtra("targetY", targetY)
+            }
+            setResult(Activity.RESULT_OK, data)
             finish()
         }
     }
