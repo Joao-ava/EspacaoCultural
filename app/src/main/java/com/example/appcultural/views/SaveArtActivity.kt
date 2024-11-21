@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 class SaveArtActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySaveArtBinding
     private val location = ArtLocation()
+    private lateinit var art: Art
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
@@ -83,7 +84,17 @@ class SaveArtActivity : AppCompatActivity() {
         val artistAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, artists)
         artistTextView.setAdapter(artistAdapter)
 
+        val artId = intent.getStringExtra("id")
         val repository = FirebaseArtsRepository()
+        lifecycleScope.launch {
+            if (artId != null) {
+                val item = repository.findById(artId)
+                if (item != null) {
+                    art = item
+                    updateForm(art)
+                }
+            }
+        }
 
         binding.artLocationField.setOnClickListener {
             startForResult.launch(Intent(this, SaveArtLocationActivity::class.java))
@@ -97,9 +108,14 @@ class SaveArtActivity : AppCompatActivity() {
                 val isActive = binding.artIsActiveField.isChecked
                 val gender = listOf(binding.artGendersField.text.toString())
                 val imageUri = binding.artImageUrlField.text.toString()
-                val art = Art("", name, publishDate, description, author, isActive, imageUri, gender, location)
+                val item = Art("", name, publishDate, description, author, isActive, imageUri, gender, location)
                 lifecycleScope.launch {
-                    repository.add(art)
+                    if (artId == "") {
+                        repository.add(item)
+                    } else {
+                        item.id = art.id
+                        repository.update(item)
+                    }
                     finish()
                 }
             } catch (err: Exception) {
@@ -109,6 +125,18 @@ class SaveArtActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.topAppBar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun updateForm(item: Art) {
+        binding.artImageUrlField.setText(item.imageUrl)
+        binding.artTitleField.setText(item.name)
+        binding.artPublishField.setText(item.publishDate.toString())
+        binding.artDescriptionField.setText(item.description)
+        binding.artIsActiveField.isActivated = item.isActive
+        binding.artGendersField.setText(item.genders[0])
+        binding.artArtistField.setText(item.author)
+        location.x = art.location.x
+        location.y = art.location.y
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

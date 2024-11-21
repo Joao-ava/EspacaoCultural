@@ -97,7 +97,9 @@ class ArtDetailActivity : AppCompatActivity() {
         val authProvider = MockAuthProvider(this)
         val visibilityState = if (authProvider.isAdmin) View.VISIBLE else View.GONE
         binding.fabEdit.setOnClickListener {
-            startActivity(Intent(this, SaveArtActivity::class.java))
+            val editIntent = Intent(this, SaveArtActivity::class.java)
+            editIntent.putExtra("id", id)
+            startActivity(editIntent)
         }
         binding.fabEdit.visibility = visibilityState
     }
