@@ -1,11 +1,13 @@
 package com.example.appcultural.views
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -94,8 +96,7 @@ class SaveArtActivity : AppCompatActivity() {
                 val author = binding.artArtistField.text.toString()
                 val isActive = binding.artIsActiveField.isChecked
                 val gender = listOf(binding.artGendersField.text.toString())
-                val imageUri = "https://www.artic.edu/iiif/2/5dca7347-c6dc-24dd-d073-d705b9cdc575/full/600,/0/default.jpg"
-                val location = ArtLocation(10, 10)
+                val imageUri = binding.artImageUrlField.text.toString()
                 val art = Art("", name, publishDate, description, author, isActive, imageUri, gender, location)
                 lifecycleScope.launch {
                     repository.add(art)

@@ -3,7 +3,7 @@
     <string name="title_activity_save_art">Salvar arte</string>
     <string name="comments">Comentários</string>
     <string name="details">Detalhes</string>
-    <string name="art_image_hint">Imagem da obra</string>
+    <string name="art_image_hint">Url da obra de arte</string>
     <string name="art_title_hint">Título da obra de arte</string>
     <string name="art_publish_hint">Data de publicação</string>
     <string name="art_description_hint">Descrição</string>
