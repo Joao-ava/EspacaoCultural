@@ -78,6 +78,13 @@ class ArtDetailActivity : AppCompatActivity() {
                 intent.putExtra("id", art.id)
                 startActivity(intent)
             }
+
+            binding.btnLocation.setOnClickListener {
+                val currentLocationIntent = Intent(context, CurrentArtLocationActivity::class.java)
+                currentLocationIntent.putExtra("currentX", art.location.x)
+                currentLocationIntent.putExtra("currentY", art.location.y)
+                startActivity(currentLocationIntent)
+            }
         }
 
         setSupportActionBar(binding.toolbarTop)
@@ -93,10 +100,6 @@ class ArtDetailActivity : AppCompatActivity() {
             startActivity(Intent(this, SaveArtActivity::class.java))
         }
         binding.fabEdit.visibility = visibilityState
-
-        binding.btnLocation.setOnClickListener {
-            startActivity(Intent(this, CurrentArtLocationActivity::class.java))
-        }
     }
 
     private fun updateImage(imageUrl: String) {

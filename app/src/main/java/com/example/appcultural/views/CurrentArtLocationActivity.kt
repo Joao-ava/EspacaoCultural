@@ -23,6 +23,12 @@ class CurrentArtLocationActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val currentX = intent.getFloatExtra("currentX", 0f)
+        val currentY = intent.getFloatExtra("currentY", 0f)
+        val imageView = binding.imageLocation
+        val targetX = currentX + imageView.x
+        val targetY = currentY + imageView.y
+        addCircle(targetX, targetY)
 
         setSupportActionBar(binding.topAppBar);
         getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
