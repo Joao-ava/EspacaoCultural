@@ -20,11 +20,13 @@ import com.example.appcultural.adapters.ArtListAdapter
 import com.example.appcultural.data.FirebaseArtsRepository
 import com.example.appcultural.data.MockAuthProvider
 import com.example.appcultural.databinding.ActivityArtDetailBinding
+import com.example.appcultural.entities.Art
 
 class ArtDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityArtDetailBinding
     private lateinit var db: FirebaseFirestore
     private var isLiked = false
+    private lateinit var art: Art
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +49,12 @@ class ArtDetailActivity : AppCompatActivity() {
 
         val context = this
         lifecycleScope.launch {
-            val art = repository.findById(id)
-            if (art == null) {
+            val item = repository.findById(id)
+            if (item == null) {
                 finish()
                 return@launch
             }
+            art = item
 
             updateImage(art.imageUrl)
 
@@ -102,6 +105,10 @@ class ArtDetailActivity : AppCompatActivity() {
             startActivity(editIntent)
         }
         binding.fabEdit.visibility = visibilityState
+
+        binding.btnMore.setOnClickListener {
+            binding.tvArtDescription.text = art.description
+        }
     }
 
     private fun updateImage(imageUrl: String) {
