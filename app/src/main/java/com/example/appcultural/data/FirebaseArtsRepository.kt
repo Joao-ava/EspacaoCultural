@@ -9,8 +9,18 @@ class FirebaseArtsRepository {
     private val db = Firebase.firestore
     private val collection = db.collection("arts")
 
-    suspend fun list(): List<Art> {
-        val result = collection.get().await()
+    suspend fun list(name: String = "", artist: String = "", gender: String = ""): List<Art> {
+        var query = collection.whereNotEqualTo("id", null)
+        if (name != "") {
+            query = query.whereEqualTo("name", name)
+        }
+        if (artist != "") {
+            query = query.whereEqualTo("artist", artist)
+        }
+        if (gender != "") {
+            query = query.whereArrayContains("genders", gender)
+        }
+        val result = query.get().await()
         return result.documents.mapNotNull { it.toObject(Art::class.java) }
     }
 
