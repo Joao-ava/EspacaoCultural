@@ -2,8 +2,11 @@ package com.example.appcultural.views
 
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 import com.example.appcultural.R
 import com.example.appcultural.adapters.ArtListAdapter
@@ -21,11 +25,12 @@ import com.example.appcultural.data.MockAuthProvider
 import com.example.appcultural.databinding.ActivityArtDetailBinding
 import com.example.appcultural.entities.Art
 
-class ArtDetailActivity : AppCompatActivity() {
+class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var binding: ActivityArtDetailBinding
     private var isLiked = false
     private lateinit var art: Art
     private val artsRepository = FirebaseArtsRepository()
+    private lateinit var tts: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,11 +107,16 @@ class ArtDetailActivity : AppCompatActivity() {
             editIntent.putExtra("id", id)
             startActivity(editIntent)
         }
+        binding.fabPlay.setOnClickListener {
+            speakArtDescription()
+        }
         binding.fabEdit.visibility = visibilityState
 
         binding.btnMore.setOnClickListener {
             binding.tvArtDescription.text = art.description
         }
+
+        tts = TextToSpeech(this, this)
     }
 
     private fun updateImage(imageUrl: String) {
@@ -140,6 +150,34 @@ class ArtDetailActivity : AppCompatActivity() {
             isLiked = artsRepository.hasLike(artId, FirebaseAuthProvider().getCurrentUser().id)
             updateLikeButton()
         }
+    }
+
+    private fun speakArtDescription() {
+        if (art.description.isNotEmpty()) {
+            tts.speak(art.description, TextToSpeech.QUEUE_FLUSH, null, null)
+        } else {
+            Toast.makeText(this, "Sem descrição disponivel", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts.setLanguage(Locale("pt", "BR"))
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Language not supported")
+            }
+        } else {
+            Log.e("TTS", "Initialization failed")
+        }
+    }
+
+    override fun onDestroy() {
+        if (tts != null) {
+            tts.stop()
+            tts.shutdown()
+        }
+        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
