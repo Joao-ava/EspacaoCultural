@@ -2,14 +2,11 @@ package com.example.appcultural.views
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.appcultural.R
 import com.example.appcultural.data.FirebaseAuthProvider
-import com.example.appcultural.data.MockAuthProvider
 import com.example.appcultural.databinding.ActivityLoginEmployeeBinding
 import kotlinx.coroutines.launch
 
@@ -42,7 +39,7 @@ class LoginEmployeeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val authProvider = FirebaseAuthProvider()
-                authProvider.login(binding.editTextTextEmail.editText?.text.toString(), binding.loginEmployeePassword.editText?.text.toString())
+                authProvider.login(binding.editTextTextEmail.editText?.text.toString() + "@empresa.com", binding.loginEmployeePassword.editText?.text.toString())
                 val isAdmin = authProvider.getAdmin(context = this@LoginEmployeeActivity)
                 if (!isAdmin) throw Exception("Usuário não é administrador")
                 startActivity(intent)

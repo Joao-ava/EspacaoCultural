@@ -3,7 +3,6 @@ package com.example.appcultural.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.appcultural.data.MockAuthProvider.Companion
 import com.example.appcultural.entities.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,6 +28,16 @@ class FirebaseAuthProvider {
                     onComplete(false, task.exception?.message)
                 }
             }
+    }
+
+    suspend fun createEmployee(email: String, password: String): Boolean {
+        val result = auth.createUserWithEmailAndPassword(email, password).await()
+        val userId = result.user?.uid
+        if (userId != null) {
+            collection.add(mapOf("userId" to userId)).await()
+            return true
+        }
+        throw Exception("Falha ao criar usuário")
     }
     suspend fun login(username: String, password: String): User {
         val result = auth.signInWithEmailAndPassword(username, password).await()
