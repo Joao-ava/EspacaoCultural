@@ -1,6 +1,7 @@
 
 package com.example.appcultural.data
 
+import com.example.appcultural.entities.User
 import com.google.firebase.auth.FirebaseAuth
 
 class FirebaseAuthProvider {
@@ -17,5 +18,8 @@ class FirebaseAuthProvider {
                     onComplete(false, task.exception?.message)
                 }
             }
+    }
+    fun getCurrentUser(): User {
+        return User(auth.currentUser?.uid ?: "", auth.currentUser?.displayName ?: "Anonimo")
     }
 }
