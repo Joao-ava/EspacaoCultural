@@ -63,6 +63,14 @@
                 android:layout_marginLeft="25sp"
                 android:text="Traduzir"
                 android:textAppearance="?attr/textAppearanceCaption" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Excluir"
+                android:textAppearance="?attr/textAppearanceCaption"
+                style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
     </LinearLayout>
 
@@ -75,5 +83,6 @@
         android:backgroundTint="@color/trasnparente"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="Like"
         app:srcCompat="@drawable/outline_favorite_24" />
 </androidx.constraintlayout.widget.ConstraintLayout>

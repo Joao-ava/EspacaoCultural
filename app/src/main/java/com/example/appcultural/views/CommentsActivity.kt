@@ -1,5 +1,6 @@
 package com.example.appcultural.views
 
+import android.R
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -31,9 +32,13 @@ class CommentsActivity : AppCompatActivity() {
         binding.recycleView.layoutManager = LinearLayoutManager(this)
 
         // Criando o adaptador
-        adapter = CommentListAdapter(comments) { comment ->
-            incrementLikeCount(comment)
-        }
+        val isAdmin = FirebaseAuthProvider().isAdmin(this)
+        adapter = CommentListAdapter(
+            comments, isAdmin, { comment ->
+                incrementLikeCount(comment)
+            },
+            deleteComment = { comment -> deleteComment(comment) },
+        )
 
         binding.recycleView.adapter = adapter
 
@@ -101,6 +106,18 @@ class CommentsActivity : AppCompatActivity() {
         }
     }
 
+    private fun deleteComment(comment: CommentItem) {
+        lifecycleScope.launch {
+            try {
+                commentsRepository.delete(comment.id)
+                loadComments()
+                Toast.makeText(this@CommentsActivity, "Comentário excluido!", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@CommentsActivity, "Erro ao adicionar comentário: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun incrementLikeCount(comment: CommentItem) {
         lifecycleScope.launch {
             try {
@@ -119,7 +136,7 @@ class CommentsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        android.R.id.home -> {
+        R.id.home -> {
             finish()
             true
         }

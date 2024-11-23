@@ -93,4 +93,8 @@ class FirebaseCommentsRepository {
             likedByUser = increment > 0
         )
     }
+
+    suspend fun delete(commentId: String) {
+        collection.document(commentId).delete().await()
+    }
 }
