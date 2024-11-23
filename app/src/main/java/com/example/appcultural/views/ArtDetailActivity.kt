@@ -11,22 +11,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 import com.example.appcultural.R
 import com.example.appcultural.adapters.ArtListAdapter
 import com.example.appcultural.data.FirebaseArtsRepository
+import com.example.appcultural.data.FirebaseAuthProvider
 import com.example.appcultural.data.MockAuthProvider
 import com.example.appcultural.databinding.ActivityArtDetailBinding
 import com.example.appcultural.entities.Art
 
 class ArtDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityArtDetailBinding
-    private lateinit var db: FirebaseFirestore
     private var isLiked = false
     private lateinit var art: Art
+    private val artsRepository = FirebaseArtsRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +38,6 @@ class ArtDetailActivity : AppCompatActivity() {
             insets
         }
 
-        db = FirebaseFirestore.getInstance()
         val repository = FirebaseArtsRepository()
         val id = intent.getStringExtra("id")
         if (id == null) {
@@ -127,29 +125,20 @@ class ArtDetailActivity : AppCompatActivity() {
     }
 
     private fun saveLikeStatus(artId: String, liked: Boolean) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
-        val artRef = db.collection("artworks").document(artId.toString())
-        val likeRef = artRef.collection("likes").document(userId)
-
-        if (liked) {
-            likeRef.set(mapOf("liked" to true))
-        } else {
-            likeRef.delete()
+        lifecycleScope.launch {
+            val user = FirebaseAuthProvider().getCurrentUser()
+            if (liked) {
+                artsRepository.addLike(artId, user.id)
+            } else {
+                artsRepository.removeLike(artId, user.id)
+            }
         }
     }
 
     private fun loadLikeStatus(artId: String) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
-        val artRef = db.collection("artworks").document(artId.toString())
-        val likeRef = artRef.collection("likes").document(userId)
-
-        likeRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                isLiked = document.getBoolean("liked") ?: false
-                updateLikeButton()
-            }
+        lifecycleScope.launch {
+            isLiked = artsRepository.hasLike(artId, FirebaseAuthProvider().getCurrentUser().id)
+            updateLikeButton()
         }
     }
 

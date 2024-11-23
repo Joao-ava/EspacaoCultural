@@ -1,6 +1,7 @@
 package com.example.appcultural.data
 
 import com.example.appcultural.entities.Art
+import com.example.appcultural.entities.ArtLike
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -8,6 +9,7 @@ import kotlinx.coroutines.tasks.await
 class FirebaseArtsRepository {
     private val db = Firebase.firestore
     private val collection = db.collection("arts")
+    private val likesCollection = db.collection("art_likes")
 
     suspend fun list(name: String = "", artist: String = "", gender: String = ""): List<Art> {
         var query = collection.whereNotEqualTo("id", null)
@@ -39,5 +41,24 @@ class FirebaseArtsRepository {
     suspend fun update(art: Art): Art {
         collection.document(art.id).set(art).await()
         return art
+    }
+
+    suspend fun hasLike(artId: String, userId: String): Boolean {
+        return likesCollection.whereEqualTo("artId", artId).whereEqualTo("userId", userId).get().await().size() != 0
+    }
+
+    suspend fun addLike(artId: String, userId: String) {
+        likesCollection.add(ArtLike(artId, userId)).await()
+    }
+
+    suspend fun removeLike(artId: String, userId: String) {
+        likesCollection.whereEqualTo("userId", userId)
+            .whereEqualTo("artId", artId)
+            .get()
+            .await()
+            .documents
+            .forEach {
+                it.reference.delete()
+            }
     }
 }
