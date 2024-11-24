@@ -70,7 +70,7 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
             binding.tvArtDescription.text = description
 
-            binding.recyclerRecommended.adapter = ArtListAdapter(context, repository.list())
+            binding.recyclerRecommended.adapter = ArtListAdapter(context, repository.list(gender=art.genders[0]))
 
             val likeButton = binding.btnLike
             likeButton.setOnClickListener {
