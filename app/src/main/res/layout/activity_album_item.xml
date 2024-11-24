@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:layout_margin="10dp">
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="horizontal">
+
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -24,6 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp">
+
                 <TextView
                     android:id="@+id/text_album_name"
                     android:layout_width="wrap_content"
@@ -32,6 +34,6 @@
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
             </LinearLayout>
         </LinearLayout>
-        
+
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
