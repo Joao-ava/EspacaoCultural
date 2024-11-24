@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.example.appcultural.data.FirebaseAuthProvider
 import com.example.appcultural.databinding.ActivitySettingBinding
 
 class SettingActivity : Fragment() {
@@ -37,6 +38,8 @@ class SettingActivity : Fragment() {
         binding.buttonAddArt.setOnClickListener {
             startActivity(Intent(requireContext(), SaveArtActivity::class.java))
         }
+        val isAdmin = FirebaseAuthProvider().isAdmin(requireContext())
+        binding.buttonAddArt.visibility = if (isAdmin) View.VISIBLE else View.GONE
 
         binding.buttonSchedule.setOnClickListener {
             startActivity(Intent(requireContext(), ScheduleListActivity::class.java))
