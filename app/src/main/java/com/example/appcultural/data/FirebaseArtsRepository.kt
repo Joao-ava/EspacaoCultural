@@ -39,7 +39,7 @@ class FirebaseArtsRepository {
         return art
     }
 
-    suspend fun fetchByIds(ids: List<String>): List<Art> {
+    suspend fun findByIds(ids: List<String>): List<Art> {
         val chunks = ids.chunked(10)
         val arts = mutableListOf<Art>()
         for (chunk in chunks) {

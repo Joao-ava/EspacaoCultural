@@ -26,6 +26,7 @@ import com.example.appcultural.data.FirebaseArtsRepository
 import com.example.appcultural.data.FirebaseAuthProvider
 import com.example.appcultural.data.MockAuthProvider
 import com.example.appcultural.databinding.ActivityArtDetailBinding
+import com.example.appcultural.entities.Album
 import com.example.appcultural.entities.Art
 
 class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
@@ -190,7 +191,8 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         val albumsRepository = FirebaseAlbumsRepository()
 
         lifecycleScope.launch {
-            val albums = albumsRepository.fetchAll()
+            val currentUser = FirebaseAuthProvider().getCurrentUser()
+            val albums = albumsRepository.list(currentUser.id)
             val albumNames = albums.map { it.name }.toTypedArray()
 
             AlertDialog.Builder(this@ArtDetailActivity)
@@ -219,7 +221,8 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 if (albumName.isNotEmpty()) {
                     lifecycleScope.launch {
                         try {
-                            val newAlbum = albumsRepository.create(albumName)
+                            val currentUser = FirebaseAuthProvider().getCurrentUser()
+                            val newAlbum = albumsRepository.create(Album(name=albumName, userId=currentUser.id))
                             appendArtToAlbum(newAlbum.id, artId)
                         } catch (e: Exception) {
                             Toast.makeText(this@ArtDetailActivity, "Erro ao criar álbum", Toast.LENGTH_SHORT).show()

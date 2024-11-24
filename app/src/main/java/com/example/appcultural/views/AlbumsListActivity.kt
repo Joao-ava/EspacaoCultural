@@ -16,6 +16,7 @@ import androidx.appcompat.widget.SearchView
 import com.example.appcultural.R
 import com.example.appcultural.adapters.AlbumListAdapter
 import com.example.appcultural.data.FirebaseAlbumsRepository
+import com.example.appcultural.data.FirebaseAuthProvider
 import com.example.appcultural.databinding.ActivityAlbumsListBinding
 import com.example.appcultural.entities.Album
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ class AlbumsListActivity : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadFromFirestore()
+        loadData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -53,7 +54,7 @@ class AlbumsListActivity : Fragment() {
         binding.recycleView.adapter = albumAdapter
 
         setupSearchView()
-        loadFromFirestore()
+        loadData()
 
         binding.addAlbumButton.setOnClickListener {
             showAddPopup()
@@ -81,10 +82,11 @@ class AlbumsListActivity : Fragment() {
         })
     }
 
-    private fun loadFromFirestore() {
+    private fun loadData() {
         lifecycleScope.launch {
             try {
-                val albums = albumsRepository.fetchAll()
+                val currentUser = FirebaseAuthProvider().getCurrentUser()
+                val albums = albumsRepository.list(currentUser.id)
                 originalAlbumList.clear()
                 originalAlbumList.addAll(albums)
                 albumAdapter.updateList(originalAlbumList)
@@ -107,7 +109,8 @@ class AlbumsListActivity : Fragment() {
             if (albumName.isNotEmpty()) {
                 lifecycleScope.launch {
                     try {
-                        val newAlbum = albumsRepository.create(albumName)
+                        val currentUser = FirebaseAuthProvider().getCurrentUser()
+                        val newAlbum = albumsRepository.create(Album(name=albumName, userId=currentUser.id))
                         originalAlbumList.add(newAlbum)
                         albumAdapter.addItem(newAlbum)
                         Toast.makeText(requireContext(), "Álbum criado com sucesso!", Toast.LENGTH_SHORT).show()

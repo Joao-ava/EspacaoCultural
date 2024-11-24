@@ -74,7 +74,7 @@ class AlbumDetailActivity : AppCompatActivity() {
             try {
                 val album = albumsRepository.findById(albumId)
                 val arts = if (album != null && album.artIds.isNotEmpty()) {
-                    artsRepository.fetchByIds(album.artIds)
+                    artsRepository.findByIds(album.artIds)
                 } else {
                     emptyList()
                 }

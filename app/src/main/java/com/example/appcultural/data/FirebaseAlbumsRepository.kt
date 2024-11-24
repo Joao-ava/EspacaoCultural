@@ -1,6 +1,7 @@
 package com.example.appcultural.data
 
 import com.example.appcultural.entities.Album
+import com.example.appcultural.entities.Art
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -8,26 +9,25 @@ class FirebaseAlbumsRepository {
     private val db = FirebaseFirestore.getInstance()
     private val collection = db.collection("albums")
 
-    suspend fun fetchAll(): List<Album> {
-        val result = collection.get().await()
-        return result.documents.mapNotNull {
-            val album = it.toObject(Album::class.java)
-            album?.id = it.id
-            album
+    suspend fun list(userId: String, name: String = ""): List<Album> {
+        val query = collection.whereEqualTo("userId", userId)
+        if (name.isNotEmpty()) {
+            query.whereEqualTo("name", userId)
         }
+        val result = query.get().await()
+        val albums = result.documents.mapNotNull { it.toObject(Album::class.java) }
+        return albums
     }
 
     suspend fun findById(albumId: String): Album? {
-        val document = collection.document(albumId).get().await()
-        val album = document.toObject(Album::class.java)
-        album?.id = document.id
+        val album = collection.document(albumId).get().await().toObject(Album::class.java)
         return album
     }
 
-    suspend fun create(name: String): Album {
-        val album = Album(name = name)
+    suspend fun create(album: Album): Album {
         val result = collection.add(album).await()
         album.id = result.id
+        result.set(album).await()
         return album
     }
 
