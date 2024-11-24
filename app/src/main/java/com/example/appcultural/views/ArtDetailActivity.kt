@@ -14,7 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -24,7 +25,6 @@ import com.example.appcultural.adapters.ArtListAdapter
 import com.example.appcultural.data.FirebaseAlbumsRepository
 import com.example.appcultural.data.FirebaseArtsRepository
 import com.example.appcultural.data.FirebaseAuthProvider
-import com.example.appcultural.data.MockAuthProvider
 import com.example.appcultural.databinding.ActivityArtDetailBinding
 import com.example.appcultural.entities.Album
 import com.example.appcultural.entities.Art
@@ -99,8 +99,7 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         setSupportActionBar(binding.toolbarTop)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val viewManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        viewManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        val viewManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         binding.recyclerRecommended.layoutManager = viewManager
 
         binding.fabEdit.setOnClickListener {
@@ -111,8 +110,8 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         binding.fabPlay.setOnClickListener {
             speakArtDescription()
         }
-        val authProvider = MockAuthProvider(this)
-        val visibilityState = if (authProvider.isAdmin) View.VISIBLE else View.GONE
+        val isAdmin = FirebaseAuthProvider().isAdmin(this)
+        val visibilityState = if (isAdmin) View.VISIBLE else View.GONE
         binding.fabEdit.visibility = visibilityState
 
         binding.btnMore.setOnClickListener {
