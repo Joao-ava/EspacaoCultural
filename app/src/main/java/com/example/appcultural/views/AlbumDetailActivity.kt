@@ -129,9 +129,10 @@ class AlbumDetailActivity : AppCompatActivity() {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, "Confira este álbum!")
+            val url = "https://www.espacocultural.com/albums/$albumId"
             putExtra(
                 Intent.EXTRA_TEXT,
-                "Dê uma olhada no álbum '${binding.topAppBar.title}' na minha app cultural!"
+                "Dê uma olhada no álbum '${binding.topAppBar.title}' na minha app cultural!\n\n$url"
             )
         }
         startActivity(Intent.createChooser(shareIntent, "Compartilhar álbum via"))
