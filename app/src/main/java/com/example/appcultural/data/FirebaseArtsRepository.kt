@@ -3,6 +3,7 @@ package com.example.appcultural.data
 import com.example.appcultural.entities.Art
 import com.example.appcultural.entities.ArtLike
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
@@ -36,6 +37,20 @@ class FirebaseArtsRepository {
         art.id = result.id
         result.set(art).await()
         return art
+    }
+
+    suspend fun fetchByIds(ids: List<String>): List<Art> {
+        val chunks = ids.chunked(10)
+        val arts = mutableListOf<Art>()
+        for (chunk in chunks) {
+            val result = collection.whereIn(FieldPath.documentId(), chunk).get().await()
+            arts.addAll(result.documents.mapNotNull {
+                val art = it.toObject(Art::class.java)
+                art?.id = it.id
+                art
+            })
+        }
+        return arts
     }
 
     suspend fun update(art: Art): Art {

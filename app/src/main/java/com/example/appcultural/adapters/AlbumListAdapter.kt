@@ -15,8 +15,9 @@ import com.example.appcultural.views.AlbumDetailActivity
 
 class AlbumListAdapter(
     private val context: Context,
-    private val albumList: List<Album>
+    private var albumList: MutableList<Album>
 ) : RecyclerView.Adapter<AlbumListAdapter.AlbumViewHolder>() {
+
     class AlbumViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageAlbum: ImageView = itemView.findViewById(R.id.image_album)
         val textAlbumName: TextView = itemView.findViewById(R.id.text_album_name)
@@ -32,7 +33,6 @@ class AlbumListAdapter(
         holder.textAlbumName.text = album.name
         Glide.with(context).load(album.imageUrl).into(holder.imageAlbum)
 
-        // Implementar o clique no item para abrir os detalhes do álbum
         holder.itemView.setOnClickListener {
             val intent = Intent(context, AlbumDetailActivity::class.java)
             intent.putExtra("albumId", album.id)
@@ -42,4 +42,15 @@ class AlbumListAdapter(
     }
 
     override fun getItemCount(): Int = albumList.size
+
+    fun updateList(newItems: List<Album>) {
+        albumList.clear()
+        albumList.addAll(newItems)
+        notifyDataSetChanged()
+    }
+
+    fun addItem(item: Album) {
+        albumList.add(item)
+        notifyItemInserted(albumList.size - 1)
+    }
 }

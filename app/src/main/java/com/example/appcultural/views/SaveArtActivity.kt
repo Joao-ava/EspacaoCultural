@@ -42,6 +42,7 @@ class SaveArtActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         val genders = listOf(
             "Impressionismo",
             "Expressionismo",
@@ -119,7 +120,7 @@ class SaveArtActivity : AppCompatActivity() {
                     finish()
                 }
             } catch (err: Exception) {
-                Toast.makeText(this, "Erro ao salvar o artista: " + err.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Erro ao salvar a arte: " + err.message, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -145,7 +146,6 @@ class SaveArtActivity : AppCompatActivity() {
                 finish()
                 true
             }
-
             else -> {
                 finish()
                 true

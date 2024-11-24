@@ -11,19 +11,22 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <SearchView
+        <!-- SearchView atualizado para usar androidx.appcompat.widget.SearchView -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
             android:layout_width="328dp"
             android:layout_height="62dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toStartOf="@+id/add_album_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:queryHint="Pesquisar álbuns" />
 
+        <!-- FloatingActionButton atualizado com contentDescription -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_album_button"
             style="?attr/floatingActionButtonPrimaryStyle"
@@ -35,7 +38,8 @@
             app:backgroundTint="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/rounded_add_24" />
+            app:srcCompat="@drawable/rounded_add_24"
+            android:contentDescription="Adicionar novo álbum" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -45,7 +49,6 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

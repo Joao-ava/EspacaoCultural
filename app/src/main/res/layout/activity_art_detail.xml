@@ -9,6 +9,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_play"
+        style="?attr/floatingActionButtonSmallStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -16,8 +17,7 @@
         android:clickable="true"
         android:src="@android:drawable/ic_media_play"
         app:layout_constraintStart_toEndOf="@+id/tv_art_details"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_buttons"
-        style="?attr/floatingActionButtonSmallStyle" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout_buttons" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout_main"
@@ -142,13 +142,13 @@
 
     <Button
         android:id="@+id/btn_location"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Localização"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintTop_toBottomOf="@+id/btn_more" />
 
     <androidx.recyclerview.widget.RecyclerView

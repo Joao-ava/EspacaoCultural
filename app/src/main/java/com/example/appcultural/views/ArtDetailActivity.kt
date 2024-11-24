@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,6 +21,7 @@ import java.util.Locale
 
 import com.example.appcultural.R
 import com.example.appcultural.adapters.ArtListAdapter
+import com.example.appcultural.data.FirebaseAlbumsRepository
 import com.example.appcultural.data.FirebaseArtsRepository
 import com.example.appcultural.data.FirebaseAuthProvider
 import com.example.appcultural.data.MockAuthProvider
@@ -44,15 +47,14 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
 
         val repository = FirebaseArtsRepository()
-        val id = intent.getStringExtra("id")
-        if (id == null) {
+        val artId = intent.getStringExtra("id") ?: run {
             finish()
             return
         }
 
         val context = this
         lifecycleScope.launch {
-            val item = repository.findById(id)
+            val item = repository.findById(artId)
             if (item == null) {
                 finish()
                 return@launch
@@ -100,20 +102,24 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         viewManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
         binding.recyclerRecommended.layoutManager = viewManager
 
-        val authProvider = MockAuthProvider(this)
-        val visibilityState = if (authProvider.isAdmin) View.VISIBLE else View.GONE
         binding.fabEdit.setOnClickListener {
             val editIntent = Intent(this, SaveArtActivity::class.java)
-            editIntent.putExtra("id", id)
+            editIntent.putExtra("id", artId)
             startActivity(editIntent)
         }
         binding.fabPlay.setOnClickListener {
             speakArtDescription()
         }
+        val authProvider = MockAuthProvider(this)
+        val visibilityState = if (authProvider.isAdmin) View.VISIBLE else View.GONE
         binding.fabEdit.visibility = visibilityState
 
         binding.btnMore.setOnClickListener {
             binding.tvArtDescription.text = art.description
+        }
+
+        binding.fabFavorite.setOnClickListener {
+            showSelectDialog(artId)
         }
 
         tts = TextToSpeech(this, this)
@@ -178,6 +184,64 @@ class ArtDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             tts.shutdown()
         }
         super.onDestroy()
+    }
+
+    private fun showSelectDialog(artId: String) {
+        val albumsRepository = FirebaseAlbumsRepository()
+
+        lifecycleScope.launch {
+            val albums = albumsRepository.fetchAll()
+            val albumNames = albums.map { it.name }.toTypedArray()
+
+            AlertDialog.Builder(this@ArtDetailActivity)
+                .setTitle("Selecione um Álbum")
+                .setItems(albumNames) { _, which ->
+                    val selectedAlbum = albums[which]
+                    appendArtToAlbum(selectedAlbum.id, artId)
+                }
+                .setPositiveButton("Criar Novo Álbum") { _, _ ->
+                    showCreateDialog(artId)
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
+    }
+
+    private fun showCreateDialog(artId: String) {
+        val albumsRepository = FirebaseAlbumsRepository()
+        val input = EditText(this)
+
+        AlertDialog.Builder(this)
+            .setTitle("Nome do Novo Álbum")
+            .setView(input)
+            .setPositiveButton("Criar") { _, _ ->
+                val albumName = input.text.toString()
+                if (albumName.isNotEmpty()) {
+                    lifecycleScope.launch {
+                        try {
+                            val newAlbum = albumsRepository.create(albumName)
+                            appendArtToAlbum(newAlbum.id, artId)
+                        } catch (e: Exception) {
+                            Toast.makeText(this@ArtDetailActivity, "Erro ao criar álbum", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(this, "O nome do álbum não pode ser vazio", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun appendArtToAlbum(albumId: String, artId: String) {
+        lifecycleScope.launch {
+            try {
+                FirebaseAlbumsRepository().appendArt(albumId, artId)
+                Toast.makeText(this@ArtDetailActivity, "Arte adicionada ao álbum", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@ArtDetailActivity, "Erro ao adicionar arte ao álbum", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
