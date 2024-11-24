@@ -16,6 +16,17 @@ class FirebaseAlbumsRepository {
         }
         val result = query.get().await()
         val albums = result.documents.mapNotNull { it.toObject(Album::class.java) }
+        val albumsWithImage = albums.filter { it.artIds.isNotEmpty() }
+        val artIds = albumsWithImage.map { it.artIds[0] }
+        if (artIds.isNotEmpty()) {
+            val arts = FirebaseArtsRepository().findByIds(artIds)
+            albumsWithImage.forEach {
+                val art = arts.find { art: Art -> art.id == it.artIds[0] }
+                if (art != null) {
+                    it.imageUrl = art.imageUrl
+                }
+            }
+        }
         return albums
     }
 
