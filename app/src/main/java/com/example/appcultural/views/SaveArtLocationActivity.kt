@@ -37,13 +37,13 @@ class SaveArtLocationActivity : AppCompatActivity() {
             if (event.action == MotionEvent.ACTION_UP) {
                 val x = event.x
                 val y = event.y
-                targetX = x
-                targetY = y
+                targetX = x + imageView.x
+                targetY = y + imageView.y
                 currentCircleView?.let {
                     it.visibility = View.GONE
                     (v.parent as ViewGroup).removeView(it)
                 }
-                addCircle(x + imageView.x, y + imageView.y)
+                addCircle(targetX, targetY)
             }
             true
         }

@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.marginLeft
+import androidx.core.view.marginTop
 import com.example.appcultural.R
 import com.example.appcultural.databinding.ActivityCurrentArtLocationBinding
 
@@ -26,8 +28,10 @@ class CurrentArtLocationActivity : AppCompatActivity() {
         val currentX = intent.getFloatExtra("currentX", 0f)
         val currentY = intent.getFloatExtra("currentY", 0f)
         val imageView = binding.imageLocation
+        val marginTop = imageView.marginTop
+        val height = 90
         val targetX = currentX + imageView.x
-        val targetY = currentY + imageView.y
+        val targetY = currentY + imageView.y + marginTop + height
         addCircle(targetX, targetY)
 
         setSupportActionBar(binding.topAppBar);

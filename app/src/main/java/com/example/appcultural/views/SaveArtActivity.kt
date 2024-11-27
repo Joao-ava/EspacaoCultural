@@ -27,8 +27,10 @@ class SaveArtActivity : AppCompatActivity() {
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
             val data: Intent = result.data!!
-            location.x = data.getFloatExtra("targetX", 0f)
-            location.y = data.getFloatExtra("targetY", 0f)
+            val x = data.getFloatExtra("targetX", 0f)
+            val y = data.getFloatExtra("targetY", 0f)
+            location.x = x
+            location.y = y
         }
     }
 

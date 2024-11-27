@@ -38,7 +38,6 @@ class BottomActivity : AppCompatActivity() {
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager = supportFragmentManager
-        println(fragment)
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(binding.frameLayout.id, fragment)
         fragmentTransaction.commit()
