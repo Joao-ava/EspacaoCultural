@@ -44,10 +44,6 @@ class LoginVisitActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Configura o botão de login com Google (adicione a lógica do GoogleSignIn aqui)
-        binding.signupButtonGoogle.setOnClickListener {
-            signIn()
-        }
     }
 
     private fun signIn(){
