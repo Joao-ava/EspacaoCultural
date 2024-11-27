@@ -12,6 +12,7 @@ class FirebaseAuthProvider {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
     private val collection = firestore.collection("admins")
+    private val usersCollection = firestore.collection("users")
 
     companion object {
         private const val PREFS_NAME = "user_prefs"
@@ -19,22 +20,18 @@ class FirebaseAuthProvider {
     }
 
     // criar usuário com email e senha:)
-    fun create(email: String, password: String, onComplete: (Boolean, String?) -> Unit) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    onComplete(true, null)
-                } else {
-                    onComplete(false, task.exception?.message)
-                }
-            }
+    suspend fun create(name: String, email: String, password: String) {
+        val result = auth.createUserWithEmailAndPassword(email, password).await()
+        val userId = result.user?.uid ?: throw Exception("Falha ao criar usuário")
+        usersCollection.add(mapOf("userId" to userId, "username" to name))
     }
 
-    suspend fun createEmployee(email: String, password: String): Boolean {
+    suspend fun createEmployee(name: String, email: String, password: String): Boolean {
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         val userId = result.user?.uid
         if (userId != null) {
             collection.add(mapOf("userId" to userId)).await()
+            usersCollection.add(mapOf("userId" to userId, "username" to name))
             return true
         }
         throw Exception("Falha ao criar usuário")
@@ -42,10 +39,16 @@ class FirebaseAuthProvider {
     suspend fun login(username: String, password: String): User {
         val result = auth.signInWithEmailAndPassword(username, password).await()
         if (result.user == null) throw Exception("Usuário não encontrado")
-        return User(result.user!!.uid, result.user!!.displayName ?: "Anonimo")
+        val userData = usersCollection.whereEqualTo("userId", result.user!!.uid).get().await()
+        if (userData.isEmpty) throw Exception("Usuário não encontrado")
+        val userDataMap = userData.documents.first().data
+        return User(result.user!!.uid, userDataMap!!.get("username") as String)
     }
-    fun getCurrentUser(): User {
-        return User(auth.currentUser?.uid ?: "", auth.currentUser?.displayName ?: "Anonimo")
+    suspend fun getCurrentUser(): User {
+        val userData = usersCollection.whereEqualTo("userId", auth.currentUser!!.uid).get().await()
+        if (userData.isEmpty) throw Exception("Usuário não encontrado")
+        val userDataMap = userData.documents.first().data
+        return User(auth.currentUser?.uid ?: "", userDataMap!!.get("username") as String)
     }
     suspend fun getAdmin(context: Context): Boolean {
         val value = collection.whereEqualTo("userId", auth.currentUser?.uid ?: "").get().await().documents.isNotEmpty()

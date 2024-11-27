@@ -64,7 +64,7 @@ class SignUpActivity : AppCompatActivity() {
         val authProvider = FirebaseAuthProvider()
         lifecycleScope.launch {
             try {
-                authProvider.createEmployee("$registration@empresa.com", password)
+                authProvider.createEmployee(name, "$registration@empresa.com", password)
                 Toast.makeText(
                     this@SignUpActivity,
                     "Cadastro de funcionário realizado com sucesso",

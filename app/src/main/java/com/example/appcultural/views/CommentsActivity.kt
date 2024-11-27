@@ -53,25 +53,26 @@ class CommentsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val authProvider = FirebaseAuthProvider()
-
-            val user = authProvider.getCurrentUser()
-            if (user == null) {
-                Toast.makeText(this, "Você precisa estar logado para comentar", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            lifecycleScope.launch {
+                val authProvider = FirebaseAuthProvider()
+                val user = authProvider.getCurrentUser()
+                if (user == null) {
+                    Toast.makeText(this@CommentsActivity, "Você precisa estar logado para comentar", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                val username = user.name ?: "Usuário Desconhecido"
+                val userId = user.id
+                // Adiciona o comentário ao Firestore
+                val comment = Comment(
+                    id = "",
+                    content = newCommentText,
+                    likes = 0,
+                    userId = userId,
+                    username = username,
+                    artId = artId
+                )
+                addComment(comment)
             }
-            val username = user.name ?: "Usuário Desconhecido"
-            val userId = user.id
-             // Adiciona o comentário ao Firestore
-            val comment = Comment(
-                id = "",
-                content = newCommentText,
-                likes = 0,
-                userId = userId,
-                username = username,
-                artId = artId
-            )
-            addComment(comment)
         }
 
         // Carregar os comentários ao iniciar a activity

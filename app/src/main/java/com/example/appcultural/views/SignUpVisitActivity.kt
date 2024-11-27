@@ -3,10 +3,12 @@ package com.example.appcultural.views
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.appcultural.databinding.ActivitySignupVisitBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.appcultural.data.FirebaseAuthProvider
+import kotlinx.coroutines.launch
 
 class SignUpVisitActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupVisitBinding
@@ -39,18 +41,13 @@ class SignUpVisitActivity : AppCompatActivity() {
     }
 
     private fun registerUser(username: String, email: String, password: String) {
-        authProvider.create(email, password) { success, errorMessage ->
-            if (success) {
-                val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-                if (userId != null) {
-                    saveUsernameToFirestore(userId, username)
-                }
-
-                Toast.makeText(this, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            try {
+                authProvider.create(username, email, password)
+                Toast.makeText(this@SignUpVisitActivity, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show()
                 finish()
-            } else {
-                Toast.makeText(this, "Falha no cadastro: ${errorMessage}", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@SignUpVisitActivity, "Falha no cadastro: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }

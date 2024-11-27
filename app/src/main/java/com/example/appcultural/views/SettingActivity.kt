@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.appcultural.data.FirebaseAuthProvider
 import com.example.appcultural.databinding.ActivitySettingBinding
+import kotlinx.coroutines.launch
 
 class SettingActivity : Fragment() {
     private lateinit var binding: ActivitySettingBinding
@@ -43,6 +45,13 @@ class SettingActivity : Fragment() {
 
         binding.buttonSchedule.setOnClickListener {
             startActivity(Intent(requireContext(), ScheduleListActivity::class.java))
+        }
+        binding.buttonSchedule.visibility = if (isAdmin) View.VISIBLE else View.GONE
+
+        lifecycleScope.launch {
+            val authProvider = FirebaseAuthProvider()
+            val user = authProvider.getCurrentUser()
+            binding.textView6.text = user.name
         }
     }
 }
